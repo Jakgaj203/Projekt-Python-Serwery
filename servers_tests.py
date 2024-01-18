@@ -1,7 +1,7 @@
 import unittest
 from collections import Counter
 
-from servers import ListServer, Product, Client, MapServer
+from servers_skeleton import ListServer, Product, Client, MapServer
 
 server_types = (ListServer, MapServer)
 
