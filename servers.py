@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import re
 from typing import Optional, List, Dict
 from abc import ABC, abstractmethod
-import re
+
 
 class Product:
 
@@ -11,8 +12,8 @@ class Product:
         if not re.fullmatch('^[a-zA-Z]+\\d+$', name):
             raise ValueError
         else:
-            self.name: str = name
-            self.price: float = price
+            self.name = name
+            self.price = price
 
     def __eq__(self, other):
         return self.name == other.name and self.price == other.price
@@ -34,13 +35,16 @@ class TooManyProductsFoundError(ServerError):
 #   (3) możliwość odwołania się do metody `get_entries(self, n_letters)` zwracającą listę produktów spełniających kryterium wyszukiwania
 
 class Server(ABC):
-    n_max_returned_entries: int = 3
+    n_max_returned_entries = 3
     def __init__(self, *args, **kwargs) ->None:
         super().__init__(*args, **kwargs)
 
     def get_entries(self, n_letters: int = 1) ->List[Product]:
+        entries =[]
         pattern = '^[a-zA-Z]{{{n}}}\\d{{2,3}}$'.format(n=n_letters)
-        entries = [prod for prod in self.get_all_products(n_letters) if re.match(pattern, prod.name)]
+        for prod in self.get_all_products(n_letters):
+            if re.match(pattern, prod.name):
+                entries.append(prod)
         if len(entries) > Server.n_max_returned_entries:
             raise TooManyProductsFoundError
         return sorted(entries, key=lambda prod: prod.price)
@@ -52,7 +56,7 @@ class Server(ABC):
 class ListServer(Server):
     def __init__(self, products: List[Product], *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.products_: List[Product] = products
+        self.products_ = products
 
     def get_all_products(self, n_letters: int = 1) -> List[Product]:
         return self.products_
@@ -74,9 +78,12 @@ class Client:
 
     def get_total_price(self, n_letters: Optional[int]) -> Optional[float]:
         try:
-            entries_ = self.server.get_entries() if n_letters is None else self.server.get_entries(n_letters)
-            if not entries_:
+            if n_letters is None:
+                entries = self.server.get_entries()
+            else:
+                entries = self.server.get_entries(n_letters)
+            if not entries:
                 return None
-            return sum([entry.price for entry in entries_])
+            return sum([entry.price for entry in entries])
         except TooManyProductsFoundError:
             return None
