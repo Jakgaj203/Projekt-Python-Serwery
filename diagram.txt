@@ -2,10 +2,11 @@
 hide empty members
 
 class Product {
- 
-  + __init__(self, name: str, price: float): None
-  + __eq__(self, other): bool
-  + __hash__(self): int
+  + name: str
+  + price: float
+  - __init__(self, name: str, price: float): None
+  - __eq__(self, other): bool
+  - __hash__(self): int
 }
 
 class ServerError{
@@ -16,26 +17,26 @@ class TooManyProductsFoundError {
 
 abstract class Server {
   + {static} n_max_returned_entries: int = 3
-  +__init__(self, *args, **kwargs): None
+  -__init__(self, *args, **kwargs): None
   + get_entries(self, n_letters: int = 1): List[Product]
   # {abstract} get_all_products(self, n_letters: int = 1): List[Product]
 }
 
 class ListServer {
-  - products_: List[Product]
-  + __init__(self, products: List[Product], *args, **kwargs): None
+  + products_: List[Product]
+  - __init__(self, products: List[Product], *args, **kwargs): None
   # {abstract} get_all_products(self, n_letters: int = 1): List[Product]
 }
 
 class MapServer {
-  - products_: Dict[str, Product]
-  + __init__(self, products: List[Product], *args, **kwargs): None
+  + products_: Dict[str, Product]
+  - __init__(self, products: List[Product], *args, **kwargs): None
   # get_all_products(self, n_letters: int = 1): List[Product]
 }
 
 class Client {
   + server_: Server
-  + __init__(self, server: Server): None
+  - __init__(self, server: Server): None
   + get_total_price(n_letters: Optional[int]): Optional[float]
 }
 
